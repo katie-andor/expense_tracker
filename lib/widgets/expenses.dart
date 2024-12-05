@@ -1,9 +1,8 @@
 import 'package:expense_tracker/expenses_list/expenses_list.dart';
-import 'package:expense_tracker/widgets/chart/chart.dart';
+import 'package:expense_tracker/models/expense.dart';
 import 'package:expense_tracker/widgets/new_expense.dart';
 import 'package:flutter/material.dart';
-import 'package:expense_tracker/models/expense.dart';
-
+import 'package:expense_tracker/widgets/chart/chart.dart';
 
 class Expenses extends StatefulWidget {
   const Expenses({super.key});
@@ -40,10 +39,10 @@ class _ExpensesState extends State<Expenses> {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Expense Deleted'),
-        duration: const Duration(seconds: 3),
+        content: Text('Expense Deleted'),
+        duration: Duration(seconds: 3),
         action: SnackBarAction(
-          label: "Undo",
+          label: 'Undo',
           onPressed: () {
             setState(() {
               _registeredExpenses.insert(expenseIndex, expense);
@@ -61,20 +60,24 @@ class _ExpensesState extends State<Expenses> {
         date: DateTime.now(),
         category: Category.food),
     Expense(
-      title: 'Plane Ticket',
-      amount: 250.37,
-      date: DateTime.now(),
-      category: Category.travel,
-    ),
+        title: 'Plane Ticket',
+        amount: 250.37,
+        date: DateTime.now(),
+        category: Category.travel),
   ];
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    // print("Width ${MediaQuery.of(context).size.width}");
+    // print("Height ${MediaQuery.of(context).size.height}");
     Widget mainContent = const Center(
-      child: Text("No Expenses Found. Click + to Add an Expense."),
+      child: Text('No Expenses Founbd. Click + to add one!'),
     );
     if (_registeredExpenses.isNotEmpty) {
       mainContent = ExpensesList(
-          expenses: _registeredExpenses, onRemoveExpense: _removeExpense);
+        expenses: _registeredExpenses,
+        onRemoveExpense: _removeExpense,
+      );
     }
 
     return Scaffold(
@@ -84,17 +87,28 @@ class _ExpensesState extends State<Expenses> {
           IconButton(
             onPressed: _openAddExpenseOverlay,
             icon: const Icon(Icons.add),
-          ),
-        ],
-      ),
-       body: Column(
-        children: [
-          Chart(expenses: _registeredExpenses ),
-          Expanded(
-            child: mainContent,
           )
         ],
       ),
+      body: width < 600
+          ? Column(
+              children: [
+                Chart(expenses: _registeredExpenses),
+                Expanded(
+                  child: mainContent,
+                )
+              ],
+            )
+          : Row(
+              children: [
+                Expanded(
+                  child: Chart(expenses: _registeredExpenses),
+                ),
+                Expanded(
+                  child: mainContent,
+                )
+              ],
+            ),
     );
   }
 }
